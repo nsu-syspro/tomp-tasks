@@ -1,0 +1,138 @@
+## Задание №5
+
+1.  Подружитесь с GitHub Classroom: перейдите по [ссылке](https://classroom.github.com/a/YfeSa8ej), создайте репозиторий и следуйте инструкциям из `README`.
+
+1.  Внесите свое имя в историю: форкните, закоммитайте и отправьте пулл-реквест в [firstcontributions/first-contributions](https://github.com/firstcontributions/first-contributions).
+    Пришлите ссылку на принятый пулл-реквест.
+
+1.  Помогите преподавателю слить две ветки в репозитории [nsu-syspro/tomp-git-exercises](https://github.com/nsu-syspro/tomp-git-exercises).
+    1.  Форкните репозиторий, скопировав все ветки (уберите галочку с `Copy the main branch only`).
+    1.  Найдите две ветки: `entrance-greeter` и `exit-greeter`, содержащие два немного разных hello-world-а. Для этого воспользуйтесь каким-либо графическим обозревателем git-репозитория или выполните `git log` с фильтрацией только интересных веток:
+
+            $ git log --graph --glob='*greeter'
+            * 3bf4d55 (exit-greeter) Add some greetings in the end
+            | * d285246 (entrance-greeter) Add some greetings in the beginning
+            |/
+            * 180d5dd (greeter) Hello world in C
+            * bcb73b4 (main) Initial commit
+
+    1.  Перейдите на ветку `greeter` и влейте в нее две означенные выше ветки (в теории, конфликтов быть не должно).
+    1.  Создайте пулл-реквест на вливание полученной ветки обратно в ветку `greeter`, т.е. пулл-реквест должен иметь такие параметры:
+        *    base repository: `nsu-syspro/tomp-git-exercises`
+        *    base: `greeter`
+        *    head repository: (ваш репозиторий)
+        *    compare: `greeter`
+    1.  Пришлите ссылку на созданный пулл-реквест.
+
+1.  В том же репозитории проведите еще одну процедуру слияния веток, но в этот раз необходимо будет разрешить конфликты.
+    1.  Перейдите на ветку `sorting`, где сначала была реализована сортировка, а потом добавлено логгирование каждого сравнения элементов.
+
+            $ git log --oneline
+            32f8878 (HEAD, sorting) Make sorting more verbose
+            2c231a2 Implement base sorting
+            ...
+
+    1.  В качестве сторонней ветки рассмотрим ветку `faster-sorting`, где был реализован другой алгоритм сортировки (возможно, более быстрый):
+
+            $ git log --oneline faster-sorting
+            871826d (faster-sorting) Use better sorting algorithm
+            2c231a2 Implement base sorting
+            ..
+
+        Как можно видеть, у них есть общий коммит, но логгирование в эту ветку не попало. Влейте `faster-sorting` в `sorting` и разрешите конфликты: чтобы и логгирование было, и алгоритм сортировки был по-лучше.
+
+    1.  Создайте пулл-реквест на вливание ветки `sorting` обратно в апстрим-ветку `sorting`.
+    1.  Пришлите ссылку на созданный пулл-реквест.
+
+1.  (Опциональное задание на rebase с конфликтами.) Ветку `sorting` можно "линеаризовать", т.е. избавиться от коммита-слияния и даже немного переупорядочить коммиты, чтобы сначала была базовая версия, потом ускоренная, потом с логгированием.
+
+    1.  Первые сложные операции лучше выполнять в новых ветках, чтобы не бояться потерять историю:
+
+            $ git switch --create mega-sorting sorting
+
+        Для демонстрации некоторых особенностей, мы ее еще и на сервер отправим (чтобы точно не потерялась):
+
+            $ git push -u origin mega-sorting
+
+    1.  Установим нашу ветку на `faster-sorting`, которую затем перебазируем на оригинальную версию сортировки (до коммита слияния):
+
+            $ git reset --hard faster-sorting
+            $ git log --oneline --graph sorting
+            *   4d8cf4f (sorting) Merge branch 'faster-sorting' into sorting
+            |\
+            | * 871826d (HEAD -> mega-sorting, faster-sorting) Use better sorting algorithm
+            * | 32f8878 Make sorting more verbose
+            |/
+            * 2c231a2 Implement base sorting
+            ...
+            $ git rebase sorting~1  # sorting~1 is equal to 32f8878
+
+    1.  После разрешения конфликтов (`git add`) и окончания перебазирования (`git rebase --continue`) должна получиться цепочка коммитов:
+
+            $ git log --oneline --graph
+            * 3ef72df (HEAD -> mega-sorting) Use better sorting algorithm
+            * 32f8878 Make sorting more verbose
+            * 2c231a2 Implement base sorting
+            ...
+
+    1.  Теперь последний штрих, давайте переставим местами два последних коммита (и разрешим конфликты):
+
+            $ git rebase --interactive HEAD~2  # HEAD~2 is equal to 2c231a2
+
+        Необходимо переставить две эти строки местами в открывшемся редакторе:
+
+            pick 32f8878 Make sorting more verbose
+            pick 3ef72df Use better sorting algorithm
+
+        (Если вы решили пользоваться vim, то достаточно просто нажать: `ddp:wq`.)
+
+        В первом коммите должен появиться новый алгоритм сортировки, но без логгирования.
+        Во втором уже должно добавиться логгирование.
+
+            $ git log --oneline --graph
+            * 3821244 (HEAD -> mega-sorting) Make sorting more verbose
+            * 432b4b1 Use better sorting algorithm
+            * 2c231a2 Implement base sorting
+            ...
+
+    1.  Попробуем отправить нашу ветку на сервер и столкнемся с ошибкой:
+
+            $ git push origin mega-sorting
+            $ To github.com:student/tomp-git-exercises.git
+            $  ! [rejected]        mega-sorting -> mega-sorting (non-fast-forward)
+            $ error: не удалось отправить некоторые ссылки в «github.com:student/tomp-git-exercises.git»
+            $ подсказка: Обновления были отклонены, так как верхушка вашей текущей ветки
+            $ подсказка: позади ее внешней части. Заберите и слейте внешние изменения
+            $ подсказка: (например, с помощью «git pull …») перед повторной попыткой отправки
+            $ подсказка: изменений.
+            $ подсказка: Для дополнительной информации, смотрите «Note about fast-forwards»
+            $ подсказка: в «git push --help».
+
+        Попробуем посмотреть, в каком состоянии наши ветки:
+
+            $ git log --oneline --graph mega-sorting origin/mega-sorting
+            * 3821244 (HEAD -> mega-sorting) Make sorting more verbose
+            * 432b4b1 Use better sorting algorithm
+            | *   4d8cf4f (origin/mega-sorting) Merge branch 'faster-sorting' into sorting
+            | |\
+            | | * 871826d (faster-sorting) Use better sorting algorithm
+            | |/
+            |/|
+            | * 32f8878 Make sorting more verbose
+            |/
+            * 2c231a2 Implement base sorting
+            ...
+
+        Git сервер отказался принять наши правки (`mega-sorting`), так как они не являются продолжением известных ему (`origin/mega-sorting`).
+        В этом случае обычно делается слияние с или перебазирование на `origin/mega-sorting`, но мы-то именно переписали историю, мы хотим чтобы новые правки заменили собою старые. Это делается с помощью опции для `push`:
+
+            $ git push origin mega-sorting --force-with-lease
+            To github.com:student/tomp-git-exercises.git
+             + 4d8cf4f...3821244 mega-sorting -> mega-sorting (forced update)
+
+    1.  Создайте пулл-реквест на вливание ветки `mega-sorting` обратно в апстрим-ветку `sorting`, не обращая внимание на сообщение о невозможности слияния.
+    1.  Пришлите ссылку на созданный пулл-реквест.
+
+
+[![Fork of the Octocat](https://octodex.github.com/images/forktocat.jpg)](https://octodex.github.com/forktocat/)
+
