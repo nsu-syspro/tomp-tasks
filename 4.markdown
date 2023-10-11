@@ -32,7 +32,7 @@
 1.  Осознайте, что язык C — это перебор для такой простой задачи, и перепишете программу на Python, создав `hello.py`, который можно запустить, даже не компилируя:
 
         $ cat > hello.py
-        println("Hello world!")
+        print("Hello world!")
         $ python3 hello.py
         Hello world!
 
