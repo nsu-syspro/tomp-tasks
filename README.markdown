@@ -7,5 +7,5 @@
 *   [Задание №4](4.markdown): основы Git
 *   [Задание №5](5.markdown): продолжение Git
 *   [Задание №6](6.markdown): кодировки и локали
-*   [Задание №7](https://classroom.github.com/a/RHyAVKye): языки разметки
+*   [Задание №7](https://github.com/nsu-syspro/tomp-markup-langs): языки разметки ([GitHub Classroom](https://classroom.github.com/a/RHyAVKye))
 
